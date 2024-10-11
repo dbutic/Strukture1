@@ -84,6 +84,6 @@ int main() {
     }
 
     free(students);
-    printf("fala kurcu");
+  
     return 0;
 }
