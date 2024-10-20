@@ -14,12 +14,6 @@ relatvan_br_bodova = br_bodova / max_br_bodova * 100*/
 #define MAX_LENGHT 100
 #define MAX_POINTS 100.0
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#define MAX_LENGTH 100
-#define MAX_POINTS 100.0  
-
 typedef struct {
     char firstName[MAX_LENGTH];
     char lastName[MAX_LENGTH];
@@ -34,6 +28,9 @@ int countStudents(const char *filename) {
     if (file == NULL) {
         printf("Error opening file!\n");
         return -1;
+    }
+    while(!feof(file)){
+
     }
 
     while (fgets(buffer, MAX_LENGTH, file) != NULL) {
