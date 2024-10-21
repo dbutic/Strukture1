@@ -127,20 +127,31 @@ int findByLastName(head h){
     return 0;    
 }
 
-int deleteElement(head h){
-    head before = NULL;
+int deleteElement(head h) {
+    head before = h;
+    head temp = h->next;
     char lastn[MAX];
+
     printf("Unesite prezime osobe koju zelite izbrisati: ");
     scanf("%s", lastn);
     printf("\n");
-    while(h->next != NULL && strcmp(lastn, h->lastname) != 0){
-        before = h;
-        h = h->next;
+
+    while(temp != NULL && strcmp(lastn, temp->lastname) != 0) {
+        before = temp;
+        temp = temp->next;
     }
-    if(before != NULL && strcmp(lastn, h->lastname) != 0){
-        h = before->next;
-        before->next = h->next;
+
+    if(temp == NULL) {
+        printf("Osoba s prezimenom %s ne postoji u listi!\n", lastn);
+        return ERROR;
     }
+
+    before->next = temp->next;
+    
+    free(temp);
+
+    printf("Osoba s prezimenom %s je izbrisana.\n", lastn);
+
     return 0;
 }
 
