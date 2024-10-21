@@ -121,7 +121,7 @@ int findByLastName(head h){
         h = h->next;
     }
     if(h == NULL)
-        printf("Ova osoba ne postoji!\n");
+        printf("Osoba s prezimenom %s ne postoji u listi!\n", lastn);
     else
         printf("Adresa trazene osobe je: %p", h);
     return 0;    
