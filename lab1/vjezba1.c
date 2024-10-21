@@ -104,7 +104,7 @@ int printStudentsFromFile(student* base, int noRows) {
 	for (i = 0; i < noRows; i++) {
 		relPoints = ((double)base[i].points / MAXNOPOINTS) * 100;
 
-		printf("\n Ucenik %s %s je imao/la apsolutan broj bodova od %d i relativan od %lf\n", base[i].name, base[i].surname, base[i].points, relPoints);
+		printf("\n Ucenik %s %s je imao/la apsolutan broj bodova od %d i relativan od %.2lf\n", base[i].name, base[i].surname, base[i].points, relPoints);
 	}
 
 	return 0;
