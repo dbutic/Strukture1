@@ -7,93 +7,105 @@ relatvan_br_bodova = br_bodova / max_br_bodova * 100*/
 
 
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAX 100
+#define MAXNOPOINTS 80
 
-#define MAX_LENGTH 100
-#define MAX_POINTS 100.0 
+
 
 typedef struct {
-    char firstName[MAX_LENGTH];
-    char lastName[MAX_LENGTH];
-    float points;
-} Student;
+	char name[MAX];
+	char surname[MAX];
+	int points;
+} student;
 
-int countStudents(const char *filename) {
-    FILE *file = fopen(filename, "r");
-    int studentCount = 0;
-    char firstName[MAX_LENGTH], lastName[MAX_LENGTH];
-    float points;
 
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        return -1;
-    }
+int readNoRows();
 
-    while (!feof(file)) {
-        if (fscanf(file, "%s %s %f", firstName, lastName, &points) == 3) {
-            studentCount++;
-        }
-    }
+int readStudentsFromFile(student* base);
 
-    fclose(file);
-    return studentCount;
-}
-
-int loadStudents(const char *filename, Student *students, int studentCount) {
-    FILE *file = fopen(filename, "r");
-
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        return 1;
-    }
-
-    int i = 0;
-
-    while (!feof(file) && i < studentCount) {
-        if (fscanf(file, "%s %s %f", students[i].firstName, students[i].lastName, &students[i].points) == 3) {
-            i++;
-        }
-    }
-
-    fclose(file);
-    return 0;
-}
-
-void printStudents(Student *students, int studentCount) {
-    printf("Students and their points:\n");
-    for (int i = 0; i < studentCount; i++) {
-        float relativePoints = (students[i].points / MAX_POINTS) * 100.0;
-        printf("%s %s - Absolute points: %.2f, Relative points: %.2f%%\n",
-               students[i].firstName, students[i].lastName, students[i].points, relativePoints);
-    }
-}
+int printStudentsFromFile(student* base, int brred);
 
 int main() {
-    Student *students;
-    int studentCount;
-    const char *filename = "students.txt";
+	int noRows=0;
+	student* base=NULL;
 
-    studentCount = countStudents(filename);
-    if (studentCount <= 0) {
-        printf("No students in the file or error reading the file.\n");
-        return 1;
-    }
 
-    students = (Student *)malloc(studentCount * sizeof(Student));
-    if (students == NULL) {
-        printf("Memory allocation error!\n");
-        return 1;
-    }
+	noRows = readNoRows();
 
-    if (loadStudents(filename, students, studentCount) != 0) {
-        free(students);
-        return 1;
-    }
+	base = malloc(sizeof(student) * noRows);
 
-    printStudents(students, studentCount);
+	if(!base){
+		printf("\nNeuspjela alokacija memorije za base\n");
+		exit (-1);
+	}
+	
+	readStudentsFromFile(base);
 
-    free(students);
+	printStudentsFromFile(base, noRows);
 
-    return 0;
+	free(base);
+		
+	return 0;
+}
+
+int readNoRows() {
+	int counter = 0;
+	FILE* studentsFile = NULL;
+	char buffer[MAX] = { 0 };
+
+	studentsFile = fopen("students.txt", "r");
+
+	if (!studentsFile) {
+		printf("\nFile studentsFile unsuccesfully opened!\n");
+		return -1;
+	}
+
+
+	while (!feof(studentsFile)) {
+		fgets(buffer, MAX, studentsFile);
+		counter++;
+	}
+
+
+	fclose(studentsFile);
+
+	return counter;
+};
+
+int readStudentsFromFile(student* base) {
+	FILE* studentsFile = NULL;
+	int i = 0;
+
+	studentsFile = fopen("students.txt", "r");
+
+	if (!studentsFile) {
+		printf("\nFile studentsFile unsuccesfully opened!\n");
+		return -1;
+	}
+
+
+	while (!feof(studentsFile)) {
+		fscanf(studentsFile, "%s %s %d", base[i].name, base[i].surname, &base[i].points);
+		i++;
+	}
+
+	fclose(studentsFile);
+
+	return 0;
+}
+
+int printStudentsFromFile(student* base, int noRows) {
+	double relPoints=0;
+	int i=0;
+
+	for (i = 0; i < noRows; i++) {
+		relPoints = ((double)base[i].points / MAXNOPOINTS) * 100;
+
+		printf("\n Ucenik %s %s je imao/la apsolutan broj bodova od %d i relativan od %lf\n", base[i].name, base[i].surname, base[i].points, relPoints);
+	}
+
+	return 0;
 }
