@@ -11,7 +11,7 @@ relatvan_br_bodova = br_bodova / max_br_bodova * 100*/
 #include<stdlib.h>
 #include<string.h>
 #define MAX 100
-#define MAXNOPOINTS 80
+#define MAXNOPOINTS 100
 
 
 
