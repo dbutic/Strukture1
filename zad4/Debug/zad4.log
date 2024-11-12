@@ -1,0 +1,5 @@
+﻿  zad4.c
+C:\Users\mirta\OneDrive\Radna površina\Strukture24\zad4\zad4.c(50,12): warning C4047: 'return': 'Position' differs in levels of indirection from 'int'
+C:\Users\mirta\OneDrive\Radna površina\Strukture24\zad4\zad4.c(76,9): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\mirta\OneDrive\Radna površina\Strukture24\zad4\zad4.c(121,15): warning C4013: 'strlen' undefined; assuming extern returning int
+C:\Users\mirta\OneDrive\Radna površina\Strukture24\zad4\zad4.c(122,12): error C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
