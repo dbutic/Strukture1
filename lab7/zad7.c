@@ -1,7 +1,8 @@
-﻿/*Napisati program koji pomo�u vezanih listi (stabala) predstavlja strukturu direktorija.
-Omogu�iti unos novih direktorija i pod-direktorija, ispis sadr�aja direktorija i
-povratak u prethodni direktorij. To�nije program treba preko menija simulirati
-kori�tenje DOS naredbi: 1- "md", 2 - "cd dir", 3 - "cd..", 4 - "dir" i 5 � izlaz.*/
+﻿/*7. Napisati program koji pomoću vezanih listi(stabala) predstavlja strukturu direktorija.
+Omogućiti unos novih direktorija i pod - direktorija, ispis sadržaja direktorija i
+povratak u prethodni direktorij.Točnije program treba preko menija simulirati
+korištenje DOS naredbi : 1 - "md", 2 - "cd dir", 3 - "cd..", 4 - "dir" i 5 – izlaz*/
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,173 +10,183 @@ kori�tenje DOS naredbi: 1- "md", 2 - "cd dir", 3 - "cd..", 4 - "dir" i 5 � i
 
 #define MAX_NAME_LENGTH 50
 
-typedef struct Directory* dirPosition;
-typedef struct Directory {
-	char name[100];
-	dirPosition child; 
-	dirPosition sibling;
-	dirPosition parent;
+typedef struct DirNode* dirPosition;
+typedef struct DirNode {
+	char name[MAX_NAME_LENGTH];
+	dirPosition nextDir;
+	dirPosition subDir;
 
-}Directory;
+}dirNode;
 
-
-typedef struct levelStack* stackPosition;
-typedef struct levelStack {
-	dirPosition dirLevelEl; //za trenutnu razinu
+typedef struct LevelStackNode* stackPosition;
+typedef struct LevelStackNode {
+	dirPosition dirLevelEl;
 	stackPosition next;
-}levelStack;
 
-dirPosition createDirectory(char name[MAX_NAME_LENGTH], dirPosition parent);
-dirPosition createSubDirectory(char name[MAX_NAME_LENGTH], dirPosition current);
-dirPosition changeDirectory(char name, dirPosition current);
-dirPosition goBack(dirPosition current); //cd..
-void listDirectories(dirPosition current);
+}levelStackNode;
+
+int menu(dirPosition rootDir, stackPosition stackTop);
+dirPosition createSubdir(dirPosition currentDir, char* dirName);
+int printDirContents(dirPosition currentDir);		//ispise ime direktorija u kojem se nalazimo i imena svih njegovih poddirektorija
+dirPosition changeDir(dirPosition currentDir, char* wantedDir);		//pomakne nas u neki poddirektorij od direktorija u kojem se nalazimo
+
+
 int push(stackPosition stackHead, dirPosition dirLevel);
 dirPosition pop(stackPosition stackTop);
 
 int main() {
-	
-	Directory dirHead = { {0}, NULL, NULL };
-	levelStack stackHead = { NULL,NULL };
+	dirNode dirHead = { {0},NULL,NULL };
+	levelStackNode stackHead = { NULL,NULL };
 	dirPosition rootDir = NULL;
 
-	rootDir = createSubDirectory("C:", &dirHead);		//moze i bez head-a jer ne triba brisat cijelo stablo
+	rootDir = createSubdir(&dirHead, "C:");		//moramo ovo da imamo temeljni level direktorija, ali mogli smo i bez head-a jer u zadatku ne moramo brisat cijelo stablo
 
 	push(&stackHead, rootDir);
 
-	
-	
-	int choice;
-	char name[100];
-	printf("Struktura direktorija\n");
-	printf("1 - md <ime>    (kreiraj direktorij)\n");
-	printf("2 - cd <ime>    (udi u pod-direktorij)\n");
-	printf("3 - cd..        (vrati se u roditeljski direktorij)\n");
-	printf("4 - dir         (ispis sadrzaja direktorija)\n");
-	printf("5 - izlaz\n");
-	
-	dirPosition currentDir = rootDir, result = NULL;
-;
-	while(1){
-		while (1) {
-			printf("Unesite izbor: ");
-			scanf("%d", &choice);
-			while (getchar() != '\n'); 
+	menu(rootDir, &stackHead);
 
-			switch (choice) {
-			case 1:
-				printf("Unesite ime novog direktorija: ");
-				scanf("%s", name);
-				result = createSubDirectory(name, currentDir);
-				continue;
-			case 2:
-				printf("Unesite ime subdirektorija: ");
-				scanf("%s", name);
-				result = changeDirectory(name, currentDir);
-				continue;
-			case 3:
-				currentDir = goBack(currentDir);
-				continue;
-			case 4:
-				listDirectories(currentDir);
-				continue;
-			case 5:
-				printf("Izlaz iz programa\n");
-				exit(0);
-				break;
-			default:
-				printf("Greska! Unesite ispravan izbor.\n");
-				continue;
-			}
-			break;
-		}
-
-	return 0;
-}
 	free(rootDir);
-	
+
+	return EXIT_SUCCESS;
 }
 
-dirPosition createDirectory(char name[MAX_NAME_LENGTH], dirPosition parent) {
-	dirPosition new_dir = NULL;
-	new_dir = (dirPosition)malloc(sizeof(Directory));
-	if (!new_dir) {
-		printf("Greska pri alokaciji memorije\n");
+int menu(dirPosition rootDir, stackPosition stackTop) {
+	char pick = '\0', dirName[MAX_NAME_LENGTH] = { 0 };
+	dirPosition currentDir = rootDir, result = NULL;
+
+	while (1) {
+
+		printf("\nMenu:\n");
+		printf("1 - md (Create Directory)\n");
+		printf("2 - cd dir (Change Directory)\n");
+		printf("3 - cd.. (Go Up)\n");				//pomaknuti se za jedan level gore u dubljini stabla (ic u roditeljski direktorij od onog u kojem se nalazimo)
+		printf("4 - dir (List Contents)\n");
+		printf("5 - exit\n");
+
+		printf("Enter your choice: ");
+		scanf(" %c", &pick);
+
+		switch (pick) {
+
+		case '1':
+			printf("\nEnter new directory name: ");
+			scanf("%s", dirName);
+
+			result = createSubdir(currentDir, dirName);
+
+			if (result != NULL)
+				printf("\nSuccessfully created subdirectory %s\n", dirName);
+
+			else
+				printf("\nUnsuccessful creation of subdirectory!\n");
+
+			continue;
+
+		case '2':
+			printf("\nEnter destination directory name: ");
+			scanf(" %s", dirName);
+
+			result = changeDir(currentDir, dirName);
+
+
+			if (result != NULL) {
+				printf("\nSuccessfully moved to directory %s\n", dirName);
+				push(stackTop, result);
+				currentDir = result;
+			}
+
+			else
+				printf("\nDestination directory not found in current directory!\n");
+
+			continue;
+
+		case '3':
+			if (currentDir != rootDir) {
+				currentDir = pop(stackTop);
+				printf("\nSuccessfully moved to directory %s\n", currentDir->name);
+			}
+
+			else {
+				printf("\nAlready in root directory!\n");
+				pop(stackTop);
+				break;
+			}
+
+			continue;
+
+		case '4':
+			printDirContents(currentDir);
+
+			continue;
+		case '5':
+			printf("\nExiting the program.\n");
+
+			break;
+
+		default:
+			printf("\nInvalid input, please try again.\n");
+
+			continue;
+		}
+
+		break;
+	}
+
+	return EXIT_SUCCESS;
+
+}
+
+dirPosition createSubdir(dirPosition currentDir, char* dirName) {
+	dirPosition newDir = NULL;
+
+	newDir = malloc(sizeof(dirNode));
+
+	if (!newDir) {
+		printf("\nUnable to allocate memory for newDir!\n");
 		return NULL;
 	}
-	strcpy(new_dir->name, name);
-	new_dir->child = NULL;
-	new_dir->sibling = NULL;
-	new_dir->parent = parent;
 
-	return new_dir;
+	strcpy(newDir->name, dirName);
+	newDir->subDir = NULL;
+
+	newDir->nextDir = currentDir->subDir;
+	currentDir->subDir = newDir;
+
+	return newDir;
 }
 
-dirPosition createSubDirectory(char name[MAX_NAME_LENGTH], dirPosition current) {
-	dirPosition new_dir = NULL;
-	new_dir = createDirectory(name, current);
-	if (!new_dir) {
-		printf("Greska pri stvaranju novog direktorija\n");
-		return NULL;
+int printDirContents(dirPosition currentDir) {
+	dirPosition currentSubdir = currentDir->subDir;
+
+	printf("\nContents of directory %s:\n", currentDir->name);
+
+	while (currentSubdir != NULL) {
+		printf("%s\n", currentSubdir->name);
+		currentSubdir = currentSubdir->nextDir;
 	}
-	if (current->child == NULL) {
-		current->child = new_dir;
-	}
-	//dodajemo novi direktorij na kraj liste siblinga
-	else {
-		dirPosition temp = current->child;
-		while (temp->sibling != NULL) {
-			temp = temp->sibling;
-		}
-		temp->sibling = new_dir;
-	}
-	return new_dir;
+
+	if (currentDir->subDir == NULL)
+		printf("(empty)\n");
+
+	return EXIT_SUCCESS;
 }
 
-dirPosition changeDirectory(char name[MAX_NAME_LENGTH], dirPosition current) {
-	dirPosition temp = current->child;
-	while (temp != NULL) {
-		if (strcmp(temp->name, name) == 0) {
-			return temp;
-		}
-		temp = temp->sibling;
-	}
-	printf("Direktorij '%s' ne postoji\n");
-	return current;
-}
+dirPosition changeDir(dirPosition currentDir, char* wantedDir) {
+	dirPosition currentSubdir = currentDir->subDir;
 
-void listDirectories(dirPosition current) {
-	if (current->child == NULL) {
-		printf("Direktorij '%s' je prazan\n", current->name);
-		return;
-	}
-	printf("Sadrzaj direktorija '%s':\n", current->name);
-	dirPosition temp = current->child;
-	while (temp != NULL) {
-		printf(" - %s\n", temp->name);
-		temp = temp->sibling;
-	}
+	while (currentSubdir != NULL && strcmp(currentSubdir->name, wantedDir) != 0)
+		currentSubdir = currentSubdir->nextDir;
 
-}
-
-dirPosition goBack(dirPosition current) {
-	if (current->parent != NULL) {
-		printf("Vraceno u direktorij '%s'\n", current->parent->name);
-		return current->parent;
-	}
-	else {
-		printf("Nalazite se u pocetnom direktoriju");
-		return current;
-	}
+	return currentSubdir;
 }
 
 int push(stackPosition stackTop, dirPosition dirLevel) {
 	stackPosition newStackNode = NULL;
 
-	newStackNode = malloc(sizeof(levelStack));
+	newStackNode = malloc(sizeof(levelStackNode));
 
 	if (!newStackNode) {
-		printf("\nNije moguce alocirati memoriju za newStackNode\n");
+		printf("\nUnable to allocate memory for newStackNode!\n");
 		return NULL;
 	}
 
