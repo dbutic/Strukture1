@@ -1,0 +1,4 @@
+﻿  zad8.c
+C:\Users\mirta\OneDrive\Radna površina\Strukture24\lab8\zad8.c(235,12): warning C4101: 'temp': unreferenced local variable
+C:\Users\mirta\OneDrive\Radna površina\Strukture24\lab8\zad8.c(185): warning C4716: 'inorderPrint': must return a value
+  lab8.vcxproj -> C:\Users\mirta\OneDrive\Radna površina\Strukture24\lab8\Debug\lab8.exe
